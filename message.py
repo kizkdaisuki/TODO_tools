@@ -7,7 +7,7 @@ def func_print_hellp_message():
     print('     add todo')
     print('     list                    show today todo list')
     print('     view                    show today start task')
-    print('Example: todo -start English 30min [high]')
+    print('Example: todo -start English 30min high')
 
 
 def func_print_all_message():

@@ -2,6 +2,8 @@ import sys
 import datetime
 import re
 import os
+from itertools import pairwise
+
 from voice import func_say as voice_func_say
 from message import func_print_hellp_message as message_func_print_hellp_message
 GLOBAL_VAR_FILEPATH_ROOT = '/Users/mac/kizk/project/py/todolist/'
@@ -17,11 +19,17 @@ def func_save_to_file(func_param_filepath: str, func_param_file_content: str = '
     with open(func_param_filepath, 'a+') as file:
         GLOBAL_VAR_COUNT += 1
         file.write(func_param_file_content)
+        file.close()
     with open(GLOBAL_VAR_COUNT_FILEPATH, 'w') as file:
         file.write(str(GLOBAL_VAR_COUNT))
+        file.close()
+
+
 def func_view_file(func_param_filepath: str):
     with open(func_param_filepath, 'r') as file:
         print(file.read())
+        file.close()
+
 
 def func_cal_time(func_param_str: str) -> str:
     local_var_time_h, local_var_time_min, local_var_time_sec = 0, 0, 0
@@ -41,6 +49,13 @@ def func_cal_time(func_param_str: str) -> str:
     return str(local_var_end_time.strftime('%H:%M:%S'))
 
 
+def func_check_cur_count() -> int:
+    local_var_cur_count = -1
+    with open(GLOBAL_VAR_COUNT_FILEPATH, 'r') as file:
+        local_var_cur_count = int(file.read())
+    return local_var_cur_count
+
+
 def func_init_filepath():
     global GLOBAL_VAR_NOW_TASK_FILEPATH
     global GLOBAL_VAR_COUNT
@@ -57,8 +72,30 @@ def func_init_filepath():
     if not os.path.exists(local_var_filename_day):
         GLOBAL_VAR_COUNT = 1
     if GLOBAL_VAR_COUNT == -1:
-        with open(GLOBAL_VAR_COUNT_FILEPATH, 'r') as file:
-            GLOBAL_VAR_COUNT = int(file.read())
+        GLOBAL_VAR_COUNT = func_check_cur_count()
+
+
+def func_change_task_file_content():
+    global GLOBAL_VAR_COUNT
+    os.system(f'vim {GLOBAL_VAR_NOW_TASK_FILEPATH}')
+    with open(GLOBAL_VAR_NOW_TASK_FILEPATH, 'r+') as file:
+        local_var_old_file_str = list(file.read())
+        local_var_str = list(map(str, str(local_var_old_file_str).split()))
+        local_var_idx = 1
+        for i in range(len(local_var_old_file_str) - 1):
+            a, b = local_var_old_file_str[i], local_var_old_file_str[i + 1]
+            if a.isdigit() and b == '.':
+                local_var_old_file_str[i] = str(local_var_idx)
+                local_var_idx += 1
+        with open(GLOBAL_VAR_COUNT_FILEPATH, 'w') as f:
+            f.write(str(local_var_idx))
+            GLOBAL_VAR_COUNT = local_var_idx
+            print(GLOBAL_VAR_COUNT)
+            f.close()
+        file.close()
+    with open(GLOBAL_VAR_NOW_TASK_FILEPATH, 'w') as file:
+        file.write(''.join(local_var_old_file_str))
+        file.close()
 
 
 def func_init(func_param_args: list):
@@ -84,6 +121,8 @@ def func_init(func_param_args: list):
             pass
         elif local_var_cmd == '--help':
             message_func_print_hellp_message()
+        elif local_var_cmd == 'change':
+            func_change_task_file_content()
         elif local_var_cmd == 'view':
             func_view_file(GLOBAL_VAR_NOW_TASK_FILEPATH)
     else:
