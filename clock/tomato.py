@@ -14,7 +14,7 @@
 import sys
 import time
 import subprocess
-
+import datetime
 WORK_MINUTES = 25
 BREAK_MINUTES = 5
 
@@ -49,14 +49,18 @@ def main():
         print(ex)
         exit(1)
 
-def clock(minutes, notify_msg='お疲れ様でした') -> int:
+
+def clock(minutes, notify_msg='お疲れ様でした') -> None:
+    h, m = minutes // 60, minutes % 60
     start_time = time.perf_counter()
-    sec_cnt = 0
+    end_time = datetime.datetime.now() + datetime.timedelta(hours=h, minutes=m)
+    end_time = str(end_time.strftime('%H:%M:%S'))
     try:
         while True:
             diff_seconds = int(round(time.perf_counter() - start_time))
             left_seconds = minutes * 60 - diff_seconds
-            if left_seconds <= 0:
+            now_time = str(datetime.datetime.now().strftime('%H:%M:%S'))
+            if left_seconds <= 0 and now_time == end_time:
                 print('')
                 break
 
@@ -64,12 +68,10 @@ def clock(minutes, notify_msg='お疲れ様でした') -> int:
             duration = min(minutes, 25)
             progressbar(diff_seconds, minutes * 60, duration, countdown)
             time.sleep(1)
-            sec_cnt += 1
     except KeyboardInterrupt:
         print('\n👋 goodbye')
     finally:
         notify_me(notify_msg)
-        return sec_cnt
 
 
 def tomato(minutes, notify_msg):
