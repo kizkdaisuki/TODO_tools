@@ -3,6 +3,7 @@ import datetime
 import re
 import os
 from itertools import pairwise
+from clock.tomato import clock as tomato_func_clock
 
 from voice import func_say as voice_func_say
 from message import func_print_hellp_message as message_func_print_hellp_message
@@ -31,6 +32,10 @@ def func_view_file(func_param_filepath: str):
         file.close()
 
 
+def func_cal_minutes(func_param_h: int, func_param_min: int) -> int:
+    return func_param_h * 60 + func_param_min
+
+
 def func_cal_time(func_param_str: str) -> str:
     local_var_time_h, local_var_time_min, local_var_time_sec = 0, 0, 0
     local_var_flg = True
@@ -45,7 +50,14 @@ def func_cal_time(func_param_str: str) -> str:
         local_var_time_h = int(local_var_time_list[0])
         local_var_time_min = int(local_var_time_list[1])
         local_var_time_sec = int(local_var_time_list[2])
-    local_var_end_time = datetime.datetime.now() + datetime.timedelta(hours=local_var_time_h, minutes=local_var_time_min, seconds=local_var_time_sec)
+    local_var_time_now = datetime.datetime.now()
+    local_var_sec_count = tomato_func_clock(func_cal_minutes(local_var_time_h, local_var_time_min))
+    local_var_time_h = local_var_sec_count / 3600
+    local_var_sec_count /= 3600
+    local_var_time_min = local_var_sec_count / 60
+    local_var_sec_count /= 60
+    local_var_time_sec = local_var_sec_count
+    local_var_end_time = local_var_time_now + datetime.timedelta(hours=local_var_time_h, minutes=local_var_time_min, seconds=local_var_time_sec)
     return str(local_var_end_time.strftime('%H:%M:%S'))
 
 
