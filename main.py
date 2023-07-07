@@ -2,17 +2,22 @@ import sys
 import datetime
 import re
 import os
+from functools import singledispatch
 from itertools import pairwise
 from clock.tomato import clock as tomato_func_clock
-
+from init.init import func_read_json as init_func_read_json
+from init.init import func_write_json as init_func_write_json
 from voice import func_say as voice_func_say
 from message import func_print_hellp_message as message_func_print_hellp_message
 
-GLOBAL_VAR_FILEPATH_ROOT = '/Users/mac/kizk/project/py/todolist/'
+GLOBAL_VAR_FILEPATH_ROOT = ''
 GLOBAL_VAR_NOW_TASK_FILEPATH = ''
 GLOBAL_VAR_COUNT = -1
-GLOBAL_VAR_COUNT_FILEPATH = '/Users/mac/kizk/project/py/todolist/count.in'
-GLOBAL_VAR_DICT_IMPORTANCE = {'low': '🌟', 'mid': '🌟' * 3, 'high': '🌟' * 5}
+GLOBAL_VAR_COUNT_FILEPATH = ''
+GLOBAL_VAR_DICT_IMPORTANCE = {'low': '🎖', 'mid': '️🎖 🎖️ 🎖️', 'high': '🎖️ 🎖️ 🎖️ 🎖️ 🎖️'}
+GLOBAL_VAR_DICT_SATISFACTION = {1: '🌟', 2: '🌟' * 2, 3: '🌟' * 3, '4': '🌟' * 4, 5: '🌟' * 5}
+
+GLOBAL_VAR_JSON_INIT = {}
 
 
 def func_save_to_file(func_param_filepath: str, func_param_file_content: str = ''):
@@ -36,6 +41,17 @@ def func_view_file(func_param_filepath: str):
 
 def func_cal_minutes(func_param_h: int, func_param_min: int) -> int:
     return func_param_h * 60 + func_param_min
+
+
+def func_cal_seconds(fund_param_time_list) -> int:
+    return fund_param_time_list[0] * 3600 + fund_param_time_list[1] * 60 + fund_param_time_list[2]
+
+
+def func_return_time_form(func_param_sec) -> str:
+    local_var_hour = func_param_sec // 3600
+    local_var_min = (func_param_sec % 3600) // 60
+    local_var_sec = func_param_sec % 60
+    return f'{local_var_hour}h{local_var_min}m{local_var_sec}s'
 
 
 def func_start_task(func_param_str: str) -> str:
@@ -72,6 +88,11 @@ def func_check_cur_count() -> int:
 def func_init_filepath():
     global GLOBAL_VAR_NOW_TASK_FILEPATH
     global GLOBAL_VAR_COUNT
+    global GLOBAL_VAR_FILEPATH_ROOT
+    global GLOBAL_VAR_COUNT_FILEPATH
+    local_var_json_dict = init_func_read_json('/Users/mac/kizk/project/py/todolist/todo.json')
+    GLOBAL_VAR_FILEPATH_ROOT = local_var_json_dict['fileroot']
+    GLOBAL_VAR_COUNT_FILEPATH = GLOBAL_VAR_FILEPATH_ROOT + 'count.in'
     local_var_now_time = str(datetime.datetime.now().strftime('%Y-%m-%d'))
     local_var_time_list = local_var_now_time.split('-')
     local_var_filename_year = GLOBAL_VAR_FILEPATH_ROOT + local_var_time_list[0] + '/'
@@ -96,7 +117,7 @@ def func_change_task_file_content(func_param_is_vim: bool = True):
         local_var_old_file_str = []
         local_var_idx = 1
         for line in file.readlines():
-            if line.find('🌟') != -1 and line.find('.') != -1:
+            if line.find('🎖') != -1 and line.find('.') != -1:
                 idx = line.find('.')
                 line = str(local_var_idx) + line[idx:]
                 local_var_idx += 1
@@ -117,6 +138,20 @@ def func_start_clock(func_param_time: str):
     tomato_func_clock(func_cal_minutes(local_var_time_h, local_var_time_min))
 
 
+def func_init_task_form(func_param_count, func_param_start_time, func_param_end_time, func_param_importance,
+                        func_param_todo, func_param_satisfaction) -> str:
+    local_var_time_delta = func_cal_seconds(func_cal_time(func_param_end_time)) - func_cal_seconds(
+        func_cal_time(func_param_start_time))
+    local_var_time_len = func_return_time_form(local_var_time_delta)
+    local_var_first = f'{func_param_count}. ︎ ❤️  {local_var_time_len} 💜 {func_param_start_time} ~ {func_param_end_time} {GLOBAL_VAR_DICT_IMPORTANCE[func_param_importance]} \n\n'
+    local_var_todo = f'    {func_param_todo} \n \n'
+    local_var_summary = f'    summary💬 \n\n'
+    local_var_satisfaction = f'    satisfaction ➤ {GLOBAL_VAR_DICT_SATISFACTION[func_param_satisfaction]} \n\n\n'
+    local_var_str = local_var_first + local_var_todo + local_var_summary + local_var_satisfaction
+
+    return local_var_str
+
+
 def func_init(func_param_args: list):
     func_init_filepath()
     func_var_args_length = len(func_param_args)
@@ -127,12 +162,26 @@ def func_init(func_param_args: list):
             local_var_time = '45min' if len(func_param_args) <= 2 else func_param_args[2]
             local_var_importance = 'mid' if len(func_param_args) <= 3 else func_param_args[3]
             local_var_start_time = str(datetime.datetime.now().strftime('%H:%M:%S'))
-            local_var_end_time = func_start_task(local_var_time)
-            local_val_str = f'{GLOBAL_VAR_COUNT}. {local_var_start_time} ~ {local_var_end_time} {GLOBAL_VAR_DICT_IMPORTANCE[local_var_importance]} \n {local_var_todo} \n \n'
-
-            func_save_to_file(GLOBAL_VAR_NOW_TASK_FILEPATH, local_val_str)
+            local_var_end_time = func_start_task(local_var_time) # finish clock
+            try:
+                local_var_satisfaction = int(input('input your satisfaction with 1~5 (default with 3)\n'))
+            except ValueError:
+                local_var_satisfaction = 3
+            except KeyboardInterrupt:
+                local_var_satisfaction = 3
+            local_var_str = func_init_task_form(GLOBAL_VAR_COUNT, local_var_start_time, local_var_end_time, local_var_importance, local_var_todo, local_var_satisfaction)
+            func_save_to_file(GLOBAL_VAR_NOW_TASK_FILEPATH, local_var_str)
+            try:
+                local_var_summary = input('do you want to add a summary? (y/n) (default with n)\n')
+            except ValueError:
+                local_var_summary = 'n'
+            except KeyboardInterrupt:
+                local_var_summary = 'n'
+            if local_var_summary == 'y' or local_var_summary == 'Y':
+                os.system(f'vim {GLOBAL_VAR_NOW_TASK_FILEPATH}')
         elif local_var_cmd == 'add':
             # TODO
+
             pass
         elif local_var_cmd == 'list':
             # TODO
