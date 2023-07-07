@@ -14,6 +14,7 @@ GLOBAL_VAR_COUNT = -1
 GLOBAL_VAR_COUNT_FILEPATH = '/Users/mac/kizk/project/py/todolist/count.in'
 GLOBAL_VAR_DICT_IMPORTANCE = {'low': '🌟', 'mid': '🌟' * 3, 'high': '🌟' * 5}
 
+
 def func_save_to_file(func_param_filepath: str, func_param_file_content: str = ''):
     global GLOBAL_VAR_COUNT
     if not len(func_param_file_content):
@@ -87,18 +88,19 @@ def func_init_filepath():
         GLOBAL_VAR_COUNT = func_check_cur_count()
 
 
-def func_change_task_file_content():
+def func_change_task_file_content(func_param_is_vim: bool = True):
     global GLOBAL_VAR_COUNT
-    os.system(f'vim {GLOBAL_VAR_NOW_TASK_FILEPATH}')
+    if func_param_is_vim:
+        os.system(f'vim {GLOBAL_VAR_NOW_TASK_FILEPATH}')
     with open(GLOBAL_VAR_NOW_TASK_FILEPATH, 'r+') as file:
-        local_var_old_file_str = list(file.read())
-        local_var_str = list(map(str, str(local_var_old_file_str).split()))
+        local_var_old_file_str = []
         local_var_idx = 1
-        for i in range(len(local_var_old_file_str) - 1):
-            a, b = local_var_old_file_str[i], local_var_old_file_str[i + 1]
-            if a.isdigit() and b == '.':
-                local_var_old_file_str[i] = str(local_var_idx)
+        for line in file.readlines():
+            if line.find('🌟') != -1 and line.find('.') != -1:
+                idx = line.find('.')
+                line = str(local_var_idx) + line[idx:]
                 local_var_idx += 1
+            local_var_old_file_str.append(line)
         with open(GLOBAL_VAR_COUNT_FILEPATH, 'w') as f:
             f.write(str(local_var_idx))
             GLOBAL_VAR_COUNT = local_var_idx
@@ -113,6 +115,8 @@ def func_start_clock(func_param_time: str):
     local_var_time_list = func_cal_time(func_param_time)
     local_var_time_h, local_var_time_min, local_var_time_sec = local_var_time_list
     tomato_func_clock(func_cal_minutes(local_var_time_h, local_var_time_min))
+
+
 def func_init(func_param_args: list):
     func_init_filepath()
     func_var_args_length = len(func_param_args)
@@ -120,7 +124,7 @@ def func_init(func_param_args: list):
         local_var_cmd = func_param_args[0]
         if local_var_cmd == 'start':
             local_var_todo = func_param_args[1]
-            local_var_time = func_param_args[2]
+            local_var_time = '45min' if len(func_param_args) <= 2 else func_param_args[2]
             local_var_importance = 'mid' if len(func_param_args) <= 3 else func_param_args[3]
             local_var_start_time = str(datetime.datetime.now().strftime('%H:%M:%S'))
             local_var_end_time = func_start_task(local_var_time)
@@ -140,6 +144,8 @@ def func_init(func_param_args: list):
             message_func_print_hellp_message()
         elif local_var_cmd == 'modify':
             func_change_task_file_content()
+        elif local_var_cmd == 'check':
+            func_change_task_file_content(False)
         elif local_var_cmd == 'view':
             func_view_file(GLOBAL_VAR_NOW_TASK_FILEPATH)
     else:

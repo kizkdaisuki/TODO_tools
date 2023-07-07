@@ -15,6 +15,7 @@ import sys
 import time
 import subprocess
 import datetime
+
 WORK_MINUTES = 25
 BREAK_MINUTES = 5
 
@@ -50,7 +51,7 @@ def main():
         exit(1)
 
 
-def clock(minutes, notify_msg='お疲れ様でした') -> None:
+def clock(minutes, notify_msg='ご主人様、お仕事疲れ様でした') -> None:
     h, m = minutes // 60, minutes % 60
     start_time = time.perf_counter()
     end_time = datetime.datetime.now() + datetime.timedelta(hours=h, minutes=m)
@@ -96,7 +97,6 @@ def progressbar(curr, total, duration=10, extra=''):
     frac = curr / total
     filled = round(frac * duration)
     print('\r', '🍅' * filled + '--' * (duration - filled), '[{:.0%}]'.format(frac), extra, end='')
-
 
 
 def notify_me(msg):
