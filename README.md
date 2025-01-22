@@ -23,13 +23,58 @@
 
 ## 使用方法
 
-### 安装
+### 基本命令
+
+- 待办事项管理
+  - todo add：交互式添加待办事项
+  - todo add "任务名"：快速添加（默认45min, mid）
+  - todo list：查看待办事项列表
+  - todo del：删除待办事项
+  - todo edit：编辑待办事项
+
+- 任务执行
+  - todo start：从待办事项中选择任务开始
+  - todo start "任务名"：直接开始任务（默认45min, mid）
+  - todo start "任务名" 时长：指定时长开始任务
+  - todo start "任务名" 时长 重要性：完整参数开始任务
+
+- 任务记录
+  - todo view：查看今日已完成任务
+  - todo modify：修改任务记录
+
+### 时间格式
+- 25min
+- 45min
+- 1h
+- 1h30min
+- 2h
+- 自定义格式（如：90min, 1.5h）
+
+### 重要性等级
+- low: 🎖
+- mid: 🎖 🎖 🎖
+- high: 🎖 🎖 🎖 🎖 🎖
+
+### 满意度评分
+- ⭐: 非常不满意
+- ⭐⭐: 不太满意
+- ⭐⭐⭐: 一般
+- ⭐⭐⭐⭐: 满意
+- ⭐⭐⭐⭐⭐: 非常满意
+
+## 数据存储
+
+数据按年/月分类存储在 data 目录下：
+- tasks.json：任务记录
+- todo.json：待办事项
+- count.in：计数器
 
 ## 依赖项
 
-- rich: 终端美化
-- questionary: 交互式命令行
-- python-dateutil: 日期处理
+- rich: 终端美化和表格显示
+- questionary: 交互式命令行界面
+- python-dateutil: 日期和时间处理
+- prompt_toolkit: 命令行样式
 
 ## 许可证
 
