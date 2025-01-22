@@ -1,0 +1,3 @@
+GB_URL = ""
+GB_PASSWORD = ""
+GB_USERNAME = ""

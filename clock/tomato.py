@@ -99,34 +99,46 @@ def progressbar(curr, total, duration=10, extra=''):
     print('\r', '🍅' * filled + '--' * (duration - filled), '[{:.0%}]'.format(frac), extra, end='')
 
 
+def send_notification(title, message, subtitle=None, sound=None, activate=None):
+    # 构建AppleScript命令
+    script = f'display notification "{message}" with title "{title}"'
+    if subtitle:
+        script += f' subtitle "{subtitle}"'
+    if sound:
+        script += f' sound name "{sound}"'
+    if activate:
+        script += f' activate "{activate}"'
+
+    # 使用osascript运行AppleScript命令
+    subprocess.run(['osascript', '-e', script])
 def notify_me(msg):
-    '''
-    # macos desktop notification
-    terminal-notifier -> https://github.com/julienXX/terminal-notifier#download
-    terminal-notifier -message <msg>
-
-    # ubuntu desktop notification
-    notify-send
-
-    # voice notification
-    say -v <lang> <msg>
-    lang options:
-    - Daniel:       British English
-    - Ting-Ting:    Mandarin
-    - Sin-ji:       Cantonese
-    '''
-
+    is_say_flg = False # 默认为提醒声音关闭
     print(msg)
     try:
-        if sys.platform == 'darwin':
+        if sys.platform == 'darwin': # macos
             # macos desktop notification
-            subprocess.run(['terminal-notifier', '-title', '🍅', '-message', msg])
-            subprocess.run(['say', '-v', 'Kyoko', msg])
-        elif sys.platform.startswith('linux'):
+            try:
+                # subprocess.run(['terminal-notifier', '-title', '🍅', '-message', msg])
+                title = '🍅'
+                message = msg
+                subtitle = 'sub'
+                sound = 'Frog'
+                send_notification(
+                    title=title,
+                    message=message,
+                    subtitle=subtitle,
+                    sound=sound,
+                )
+                subprocess.run(['say', '-v', 'Kyoko', msg])
+            except Exception as e:
+                print('macos error:', e)
+
+            if is_say_flg:
+                subprocess.run(['say', '-v', 'Kyoko', msg])
+        elif sys.platform.startswith('linux'): # linux
             # ubuntu desktop notification
             subprocess.Popen(["notify-send", '🍅', msg])
-        else:
-            # windows?
+        else:  # windows?
             # TODO: windows notification
             pass
 

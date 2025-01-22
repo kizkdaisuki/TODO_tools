@@ -10,4 +10,4 @@ function func_init() {
 }
 
 func_init $1 $2 $3 $4 $5
-python3 /Users/mac/kizk/project/PY/TODO_tools/main.py ${todo_thing} ${todo_cmd} ${todo_time} ${todo_importance} ${todo_another}
+python3 /Users/kizk/kizk/project/PY/TODO_tools/main.py ${todo_thing} ${todo_cmd} ${todo_time} ${todo_importance} ${todo_another}
