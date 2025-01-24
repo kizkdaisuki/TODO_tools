@@ -195,3 +195,40 @@ class TaskManager:
     def show_day_summary(self):
         """显示今日总结"""
         self.day_summary.show_summary()
+
+    def delete_task(self):
+        """删除已完成任务"""
+        # 只显示已完成的任务
+        completed_tasks = {
+            k: v for k, v in self.tasks.items() 
+            if v.status == "completed"
+        }
+        
+        if not completed_tasks:
+            console.print("[yellow]今日暂无已完成任务[/yellow]")
+            return
+
+        # 显示任务列表
+        table = generate_task_table(completed_tasks)
+        console.print(table)
+
+        # 选择要删除的任务
+        choices = [
+            f"{task_id}: {task.name} ({task.task_len}, {config.DICT_IMPORTANCE[task.importance]})"
+            for task_id, task in completed_tasks.items()
+        ]
+
+        selected = questionary.select(
+            "请选择要删除的任务:",
+            choices=choices,
+            style=config.QUESTIONARY_STYLE
+        ).ask()
+
+        if selected:
+            task_id = selected.split(":")[0]
+            # 二次确认
+            if questionary.confirm(f"确定要删除任务 {task_id}?").ask():
+                del self.tasks[task_id]
+                self.save_tasks()
+                console.print("[green]成功删除任务[/green]")
+                self.view_tasks()

@@ -6,6 +6,8 @@ from todo_tools.core.task_manager import TaskManager
 from todo_tools.core.todo_manager import TodoManager
 from todo_tools.core.file_manager import init_filepath
 from todo_tools.cli.messages import func_print_help_message
+import questionary
+from todo_tools.utils.config import config
 
 def main():
     """主函数"""
@@ -37,7 +39,17 @@ def main():
     elif cmd == 'list':
         task_manager.todo_manager.list_todos()
     elif cmd == 'del':
-        task_manager.todo_manager.delete_todo()
+        # 选择删除类型
+        delete_type = questionary.select(
+            "请选择要删除的内容:",
+            choices=["待办事项", "已完成任务"],
+            style=config.QUESTIONARY_STYLE
+        ).ask()
+        
+        if delete_type == "待办事项":
+            task_manager.todo_manager.delete_todo()
+        else:
+            task_manager.delete_task()
     elif cmd == 'edit':
         task_manager.todo_manager.edit_todo()
     elif cmd == 'view':

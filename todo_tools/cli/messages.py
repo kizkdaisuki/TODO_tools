@@ -14,7 +14,7 @@ def func_print_help_message():
     console.print('     ✅ add                    添加待办事项（交互式）')
     console.print('     ✅ add <任务名称>          快速添加待办事项（默认45min, mid）')
     console.print('     ✅ list                   查看待办事项列表')
-    console.print('     ✅ del                    删除待办事项（交互式）')
+    console.print('     ✅ del                    删除待办事项或已完成任务（交互式）')
     console.print('     ✅ edit                   编辑待办事项（交互式）')
     console.print()
     console.print('任务执行:')

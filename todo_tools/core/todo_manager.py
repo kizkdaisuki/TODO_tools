@@ -70,23 +70,25 @@ class TodoManager:
 
     def delete_todo(self):
         """删除待办事项"""
-        if not self.todos:
+        # 只显示未完成的待办事项
+        pending_todos = {
+            k: v for k, v in self.todos.items() 
+            if v.status == "pending"
+        }
+        
+        if not pending_todos:
             console.print("[yellow]当前没有待办事项[/yellow]")
             return
 
         # 显示待办事项列表
-        self.list_todos()
+        table = generate_todo_table(pending_todos)
+        console.print(table)
 
         # 选择要删除的项目
         choices = [
             f"{todo_id}: {todo.name} ({todo.time}, {config.DICT_IMPORTANCE[todo.importance]})"
-            for todo_id, todo in self.todos.items()
-            if todo.status == "pending"
+            for todo_id, todo in pending_todos.items()
         ]
-
-        if not choices:
-            console.print("[yellow]没有可删除的待办事项[/yellow]")
-            return
 
         selected = questionary.select(
             "请选择要删除的待办事项:",
@@ -96,6 +98,7 @@ class TodoManager:
 
         if selected:
             todo_id = selected.split(":")[0]
+            # 二次确认
             if questionary.confirm(f"确定要删除待办事项 {todo_id}?").ask():
                 self.todos[todo_id].status = "deleted"
                 self.save_todos()
