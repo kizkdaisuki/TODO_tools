@@ -10,6 +10,7 @@ class Task:
     start_time: str
     end_time: str
     task_len: str
+    planned_time: str
     importance: str
     satisfaction: int
     status: str = 'completed'
@@ -24,6 +25,7 @@ class Task:
             'start_time': self.start_time,
             'end_time': self.end_time,
             'task_len': self.task_len,
+            'planned_time': self.planned_time,
             'importance': self.importance,
             'satisfaction': self.satisfaction,
             'status': self.status,
@@ -40,6 +42,7 @@ class Task:
             start_time=data['start_time'],
             end_time=data['end_time'],
             task_len=data['task_len'],
+            planned_time=data.get('planned_time', data['task_len']),
             importance=data['importance'],
             satisfaction=data['satisfaction'],
             status=data.get('status', 'completed'),

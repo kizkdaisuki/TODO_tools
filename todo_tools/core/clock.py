@@ -3,7 +3,7 @@ import time
 import threading
 import signal
 import platform
-from datetime import datetime
+from datetime import datetime, timedelta
 import subprocess
 from rich.live import Live
 from todo_tools.utils.table_utils import generate_timer_table, console
@@ -35,7 +35,10 @@ class TomatoClock:
         system = platform.system()
         try:
             if system == "Darwin":  # macOS
+                # 使用系统通知
                 subprocess.run(['osascript', '-e', f'display notification "{message}" with title "TODO"'])
+                # 添加声音提示
+                subprocess.run(['afplay', '/System/Library/Sounds/Glass.aiff'])
             elif system == "Linux":
                 subprocess.run(['notify-send', "TODO", message])
             elif system == "Windows":
@@ -85,9 +88,8 @@ class TomatoClock:
                 live.update(final_table)
                 time.sleep(0.5)  # 稍微暂停一下让用户看到100%
                 
-                # 清除计时器显示
+                # 不再清除计时器显示
                 live.stop()
-                console.clear()
                 
                 # 显示完成信息
                 self._notify("任务完成！")
@@ -99,10 +101,21 @@ class TomatoClock:
         if not self.task:  # 防止重复调用
             return
         
+        # 计算实际用时
+        start_time = datetime.strptime(self.task.start_time, '%H:%M:%S')
+        end_time = datetime.now()
+        
+        # 如果跨天，需要特殊处理
+        if end_time.time() < start_time.time():
+            end_time = end_time + timedelta(days=1)
+        
+        time_diff = end_time - start_time.replace(year=end_time.year, month=end_time.month, day=end_time.day)
+        actual_seconds = int(time_diff.total_seconds())
+        
         # 更新任务状态
-        self.task.end_time = datetime.now().strftime('%H:%M:%S')
-        self.task.status = "completed"  # 无论如何都标记为已完成
-        self.task.task_len = func_return_time_form(self.total_seconds)
+        self.task.end_time = end_time.strftime('%H:%M:%S')
+        self.task.status = "completed"
+        self.task.task_len = f"{actual_seconds//3600}h{(actual_seconds%3600)//60}m{actual_seconds%60}s"
         
         # 获取满意度评分
         empty_inputs = 0  # 记录空输入次数

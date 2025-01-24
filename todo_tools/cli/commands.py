@@ -46,6 +46,8 @@ def main():
         task_manager.modify_tasks()
     elif cmd == 'check':
         task_manager.check_tasks()
+    elif cmd == 'day':
+        task_manager.show_day_summary()
     elif cmd in ['--help', '-h']:
         func_print_help_message()
     else:

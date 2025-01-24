@@ -26,15 +26,50 @@ def func_cal_time(func_param_time: str) -> str:
 
 def parse_duration(duration: str) -> int:
     """解析时长字符串为秒数"""
-    if 'h' in duration and 'm' in duration:
-        hours, minutes = duration.split('h')
-        minutes = minutes.replace('min', '').replace('m', '')
-        return int(hours) * 3600 + int(minutes) * 60
-    elif 'h' in duration:
-        hours = duration.replace('h', '')
-        return int(hours) * 3600
-    elif 'min' in duration or 'm' in duration:
-        minutes = duration.replace('min', '').replace('m', '')
-        return int(minutes) * 60
-    else:
-        return 0 
+    if not duration:
+        return 0
+    
+    try:
+        # 处理时分秒格式 (例如: "0h45m0s")
+        hours = minutes = seconds = 0
+        
+        # 处理小时部分
+        if 'h' in duration:
+            parts = duration.split('h')
+            hours = int(parts[0])
+            duration = parts[1] if len(parts) > 1 else ''
+        
+        # 处理分钟部分
+        if 'm' in duration:
+            parts = duration.split('m')
+            minutes = int(parts[0])
+            duration = parts[1] if len(parts) > 1 else ''
+        
+        # 处理秒数部分
+        if 's' in duration:
+            seconds = int(duration.rstrip('s'))
+        elif duration and duration.isdigit():
+            seconds = int(duration)
+            
+        return hours * 3600 + minutes * 60 + seconds
+        
+    except (ValueError, IndexError):
+        # 如果解析失败，尝试其他格式
+        try:
+            # 处理纯数字（假设是分钟）
+            if duration.isdigit():
+                return int(duration) * 60
+                
+            # 处理分钟格式 (例如: "45min")
+            if 'min' in duration:
+                minutes = int(duration.replace('min', ''))
+                return minutes * 60
+                
+            # 处理纯秒数格式 (例如: "450s")
+            if duration.endswith('s'):
+                return int(duration.rstrip('s'))
+                
+        except (ValueError, IndexError):
+            return 0
+            
+    return 0  # 无法解析的格式返回0 

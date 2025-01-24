@@ -9,6 +9,7 @@ from todo_tools.utils.time_utils import parse_duration
 from todo_tools.core.clock import TomatoClock
 from todo_tools.core.todo_manager import TodoManager
 import questionary
+from todo_tools.core.day_summary import DaySummary  # 添加这行导入
 
 class TaskManager:
     def __init__(self):
@@ -16,6 +17,7 @@ class TaskManager:
         self.load_tasks()
         self.clock = TomatoClock(self)  # 传入 self 以便更新任务状态
         self.todo_manager = TodoManager(self)  # 创建待办事项管理器
+        self.day_summary = DaySummary(self, self.todo_manager)  # 创建日总结管理器
 
     def load_tasks(self):
         """加载任务"""
@@ -51,6 +53,14 @@ class TaskManager:
         time_str = args[1] if len(args) > 1 else "45min"  # 默认45分钟
         importance = args[2] if len(args) > 2 else "mid"  # 默认中等重要性
         
+        # 选择模式
+        mode = questionary.select(
+            "请选择计时模式:",
+            choices=["标准模式", "余量模式 (+20%)"],
+            default="标准模式",
+            style=config.QUESTIONARY_STYLE
+        ).ask()
+        
         # 创建新任务
         task_id = str(len(self.tasks) + 1)
         start_time = datetime.datetime.now().strftime('%H:%M:%S')
@@ -60,7 +70,8 @@ class TaskManager:
             name=name,
             start_time=start_time,
             end_time="",
-            task_len=time_str,
+            task_len="",
+            planned_time=time_str,  # 保存原始计划时长
             importance=importance,
             satisfaction=0,
             status="running"
@@ -70,8 +81,12 @@ class TaskManager:
         self.tasks[task_id] = task
         self.save_tasks()
         
-        # 启动番茄钟
+        # 计算实际计时时长
         seconds = parse_duration(time_str)
+        if mode == "余量模式 (+20%)":
+            seconds = int(seconds * 1.2)  # 增加20%的时间
+        
+        # 启动番茄钟
         try:
             self.clock.start(task, seconds)
         except KeyboardInterrupt:
@@ -176,3 +191,7 @@ class TaskManager:
             self.save_tasks()
             console.print("[green]成功更新任务[/green]")
             self.view_tasks()
+
+    def show_day_summary(self):
+        """显示今日总结"""
+        self.day_summary.show_summary()

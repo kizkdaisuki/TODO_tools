@@ -18,7 +18,8 @@ def generate_task_table(tasks: dict) -> Table:
     table.add_column("任务名称", style="green")
     table.add_column("开始时间", style="magenta")
     table.add_column("结束时间", style="magenta")
-    table.add_column("时长", style="yellow")
+    table.add_column("计划时长", style="yellow")
+    table.add_column("实际时长", style="yellow")
     table.add_column("重要性", justify="center")
     table.add_column("满意度", justify="center")
     table.add_column("状态", style="blue")
@@ -38,6 +39,7 @@ def generate_task_table(tasks: dict) -> Table:
             task.name,
             task.start_time,
             task.end_time,
+            task.planned_time,
             task.task_len,
             config.DICT_IMPORTANCE[task.importance],
             satisfaction_display,

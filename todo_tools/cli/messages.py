@@ -26,6 +26,7 @@ def func_print_help_message():
     console.print('任务记录:')
     console.print('     ✅ view                   查看今日已完成任务')
     console.print('     ✅ modify                 修改任务记录（交互式）')
+    console.print('     ✅ day                    查看今日任务总结')
     console.print('     ✅ -h, --help            显示帮助信息')
     console.print()
     console.print('时长格式: 25min, 45min, 1h, 1h30min, 2h')
