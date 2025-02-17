@@ -60,6 +60,15 @@ def main():
         task_manager.check_tasks()
     elif cmd == 'day':
         task_manager.show_day_summary()
+    elif cmd == 'show':
+        from todo_tools.web.web_server import start_server
+        start_server()
+    elif cmd == 'dev':
+        # 开发模式，启用所有调试功能
+        from todo_tools.web.web_server import app
+        app.config['DEBUG'] = True
+        app.config['TEMPLATES_AUTO_RELOAD'] = True
+        app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=True)
     elif cmd in ['--help', '-h']:
         func_print_help_message()
     else:

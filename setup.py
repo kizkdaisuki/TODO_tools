@@ -8,7 +8,8 @@ setup(
         "rich>=10.0.0",
         "questionary>=1.10.0",
         "python-dateutil>=2.8.2",
-        "prompt_toolkit>=3.0.0"
+        "prompt_toolkit>=3.0.0",
+        "flask>=2.0.0"
     ],
     entry_points={
         'console_scripts': [
@@ -27,4 +28,10 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.8",
+    package_data={
+        'todo_tools': [
+            'web/static/*',
+        ],
+    },
+    include_package_data=True,
 ) 

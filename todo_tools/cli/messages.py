@@ -32,4 +32,6 @@ def func_print_help_message():
     console.print('时长格式: 25min, 45min, 1h, 1h30min, 2h')
     console.print('重要性等级: low, mid, high')
     console.print('------------------------------------------------------------------')
+    console.print('可视化:')
+    console.print('     ✅ show                   在浏览器中查看可视化面板')
     console.print() 

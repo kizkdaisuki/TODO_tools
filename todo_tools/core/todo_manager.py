@@ -179,15 +179,22 @@ class TodoManager:
         # 显示待办事项列表
         self.list_todos()
 
-        # 选择要开始的项目
+        # 显示提示信息
+        console.print()
+        console.print("[blue]提示：[/blue]")
+        console.print("1. 未完成的待办事项将使用原定时长")
+        console.print("2. 已完成的待办事项将增加45分钟的时长")
+        console.print()
+
+        # 选择要开始的项目（包括已完成的）
         choices = [
-            f"{todo_id}: {todo.name} ({todo.time}, {config.DICT_IMPORTANCE[todo.importance]})"
+            f"{todo_id}: {todo.name} ({todo.time}, {config.DICT_IMPORTANCE[todo.importance]}) {'[已完成]' if todo.status == 'completed' else ''}"
             for todo_id, todo in self.todos.items()
-            if todo.status == "pending"
+            if todo.status != "deleted"
         ]
 
         if not choices:
-            console.print("[yellow]没有可开始的待办事项[/yellow]")
+            console.print("[yellow]没有可选择的待办事项[/yellow]")
             return
 
         selected = questionary.select(
@@ -200,9 +207,11 @@ class TodoManager:
             todo_id = selected.split(":")[0]
             todo = self.todos[todo_id]
             
-            # 标记待办事项为已完成
-            todo.status = "completed"
-            self.save_todos()
-            
-            # 启动对应的任务
-            self.task_manager.start_task([todo.name, todo.time, todo.importance]) 
+            if todo.status == "completed":
+                # 如果是已完成的待办事项，查找对应的任务并继续
+                self.task_manager.continue_task(todo.name)
+            else:
+                # 如果是未完成的待办事项，创建新任务
+                todo.status = "completed"
+                self.save_todos()
+                self.task_manager.start_task([todo.name, todo.time, todo.importance]) 

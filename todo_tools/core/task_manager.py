@@ -232,3 +232,64 @@ class TaskManager:
                 self.save_tasks()
                 console.print("[green]成功删除任务[/green]")
                 self.view_tasks()
+
+    def continue_task(self, task_name: str):
+        """继续完成已存在的任务"""
+        # 查找最近一次完成的同名任务
+        target_task = None
+        for task in reversed(self.tasks.values()):
+            if task.name == task_name and task.status == "completed":
+                target_task = task
+                break
+        
+        if target_task:
+            # 选择模式
+            mode = questionary.select(
+                "请选择计时模式:",
+                choices=["标准模式", "余量模式 (+20%)"],
+                default="标准模式",
+                style=config.QUESTIONARY_STYLE
+            ).ask()
+            
+            # 更新开始时间
+            start_time = datetime.datetime.now().strftime('%H:%M:%S')
+            
+            # 创建新的任务记录（使用新的task_id）
+            new_task_id = str(len(self.tasks) + 1)
+            task = Task(
+                task_id=new_task_id,  # 使用新的task_id
+                name=target_task.name,
+                start_time=start_time,
+                end_time="",
+                task_len="",  # 新任务的时长初始为空
+                planned_time="45min",  # 新增时长默认45分钟
+                importance=target_task.importance,
+                satisfaction=target_task.satisfaction,
+                status="running"
+            )
+            
+            # 保存新任务状态
+            self.tasks[new_task_id] = task  # 使用新的task_id保存
+            self.save_tasks()
+            
+            # 计算番茄钟时长
+            seconds = 45 * 60  # 默认45分钟
+            if mode == "余量模式 (+20%)":
+                seconds = int(seconds * 1.2)  # 增加20%的时间
+            
+            # 启动番茄钟
+            try:
+                self.clock.start(task, seconds)
+                
+                # 番茄钟结束后，更新任务状态
+                task.status = "completed"
+                self.save_tasks()
+                console.print(f"[green]已完成任务 {task_name}[/green]")
+                
+            except KeyboardInterrupt:
+                # 处理中断
+                task.status = "completed"
+                self.save_tasks()
+        else:
+            # 如果没有找到历史任务，则创建新任务
+            self.start_task([task_name, "45min", "mid"])
