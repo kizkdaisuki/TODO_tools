@@ -92,19 +92,13 @@ def get_data(date):
                 if todo_file.exists():
                     with open(todo_file, 'r', encoding='utf-8') as f:
                         todos = json.load(f)
-                    print(f"Loaded todos: {len(todos)} items")  # 调试信息
-                else:
-                    print(f"Todo file not found: {todo_file}")  # 调试信息
-                    
+                        
                 if tasks_file.exists():
                     with open(tasks_file, 'r', encoding='utf-8') as f:
                         tasks = json.load(f)
                         # 确保 feeling 字段存在
                         for task in tasks.values():
                             task['feeling'] = task.get('summary', '')  # 将 summary 映射到 feeling
-                    print(f"Loaded tasks: {len(tasks)} items")  # 调试信息
-                else:
-                    print(f"Tasks file not found: {tasks_file}")  # 调试信息
             except Exception as e:
                 print(f"Error reading files: {str(e)}")
                 raise
@@ -119,29 +113,47 @@ def get_data(date):
         satisfaction_scores = [t.get('satisfaction', 0) for t in tasks.values()]
         avg_satisfaction = round(sum(satisfaction_scores) / len(satisfaction_scores), 1) if satisfaction_scores else 0
         
-        # 计算时间效率
-        def parse_time_to_minutes(time_str):
+        # 计算时间效率 - 只计算已完成任务
+        def parse_time_to_seconds(time_str):
+            """将时间字符串转换为秒数"""
             if not time_str:
                 return 0
             try:
-                if 'h' in time_str and ('min' in time_str or 'm' in time_str):
+                # 处理 "0h30m9s" 格式
+                hours = minutes = seconds = 0
+                if 'h' in time_str:
                     hours = int(time_str.split('h')[0])
-                    minutes = int(''.join(filter(str.isdigit, time_str.split('h')[1])))
-                    return hours * 60 + minutes
-                elif 'h' in time_str:
-                    hours = int(time_str.replace('h', ''))
-                    return hours * 60
-                elif 'min' in time_str or 'm' in time_str:
-                    minutes = int(''.join(filter(str.isdigit, time_str)))
-                    return minutes
-                return 0
+                    time_str = time_str.split('h')[1]
+                if 'm' in time_str:
+                    minutes = int(time_str.split('m')[0])
+                    time_str = time_str.split('m')[1] if 's' in time_str else ''
+                if 's' in time_str:
+                    seconds = int(time_str.replace('s', ''))
+                
+                return hours * 3600 + minutes * 60 + seconds
             except:
+                print(f"Error parsing time: {time_str}")
                 return 0
 
-        planned_times = sum([parse_time_to_minutes(t.get('planned_time', '0min')) for t in tasks.values()])
-        actual_times = sum([parse_time_to_minutes(t.get('task_len', '0min')) for t in tasks.values()])
+        # 只计算已完成任务的时间效率
+        completed_tasks = [t for t in tasks.values() if t.get('status') == 'completed']
         
-        time_efficiency = round((planned_times / actual_times * 100) if actual_times > 0 else 0)
+        # 添加调试信息
+        print("Completed tasks:", len(completed_tasks))
+        for task in completed_tasks:
+            print(f"Task: {task.get('task_name')}")
+            print(f"Planned time: {task.get('planned_time')} -> {parse_time_to_seconds(task.get('planned_time', '0s'))} seconds")
+            print(f"Actual time: {task.get('task_len')} -> {parse_time_to_seconds(task.get('task_len', '0s'))} seconds")
+        
+        planned_seconds = sum([parse_time_to_seconds(t.get('planned_time', '0s')) for t in completed_tasks])
+        actual_seconds = sum([parse_time_to_seconds(t.get('task_len', '0s')) for t in completed_tasks])
+        
+        print(f"Total planned time: {planned_seconds} seconds")
+        print(f"Total actual time: {actual_seconds} seconds")
+        
+        # 计算时间效率 = 计划时间 / 实际时间 * 100，保留一位小数
+        time_efficiency = round((planned_seconds / actual_seconds * 100), 1) if actual_seconds > 0 else 0
+        print(f"Time efficiency: {time_efficiency}%")
         
         response_data = {
             'todos': todos,
@@ -152,8 +164,8 @@ def get_data(date):
                 'time_efficiency': time_efficiency,
                 'completed_todos': completed_todos,
                 'total_todos': total_todos,
-                'planned_time': planned_times,
-                'actual_time': actual_times
+                'planned_time': planned_seconds,
+                'actual_time': actual_seconds
             }
         }
         
@@ -222,19 +234,23 @@ def start_server():
     finally:
         server_running = False 
 
-def parse_time_to_minutes(time_str):
-    """将时间字符串转换为分钟数"""
-    try:
-        if 'h' in time_str and 'min' in time_str:
-            hours, minutes = time_str.split('h')
-            minutes = minutes.replace('min', '')
-            return int(hours) * 60 + int(minutes)
-        elif 'h' in time_str:
-            hours = time_str.replace('h', '')
-            return int(hours) * 60
-        elif 'min' in time_str:
-            minutes = time_str.replace('min', '')
-            return int(minutes)
+def parse_time_to_seconds(time_str):
+    """将时间字符串转换为秒数"""
+    if not time_str:
         return 0
+    try:
+        # 处理 "0h30m9s" 格式
+        hours = minutes = seconds = 0
+        if 'h' in time_str:
+            hours = int(time_str.split('h')[0])
+            time_str = time_str.split('h')[1]
+        if 'm' in time_str:
+            minutes = int(time_str.split('m')[0])
+            time_str = time_str.split('m')[1] if 's' in time_str else ''
+        if 's' in time_str:
+            seconds = int(time_str.replace('s', ''))
+        
+        return hours * 3600 + minutes * 60 + seconds
     except:
+        print(f"Error parsing time: {time_str}")
         return 0 

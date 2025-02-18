@@ -182,12 +182,17 @@ createApp({
                     actual_time: 0
                 }
                 
+                // 直接使用后端计算的时间效率
                 completionRate.value = stats.completion_rate
                 avgSatisfaction.value = stats.avg_satisfaction
                 timeEfficiency.value = stats.time_efficiency
                 
                 // 更新图表
                 updateCharts(stats)
+
+                // 在 fetchData 函数中添加调试信息
+                console.log('Backend stats:', data.stats)
+                console.log('Time efficiency:', data.stats.time_efficiency)
             } catch (error) {
                 console.error('加载数据失败:', error)
                 // 设置默认值
