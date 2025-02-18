@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TODO Dashboard</title>
+    <title>桜🌸小姐</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <link rel="stylesheet" href="/static/css/style.css">
@@ -11,14 +11,24 @@
 <body>
     <div id="app" class="container">
         <div class="header">
-            <select v-model="selectedDate" 
-                    @change="loadDateData"
-                    class="date-select">
-                <option v-for="date in availableDates" :key="date" :value="date">
-                    {{ date }}
-                </option>
-            </select>
-            <h1>TODO Dashboard</h1>
+            <div class="date-navigation">
+                <button class="nav-button prev-day" 
+                        @click="navigateDate(-1)"
+                        :disabled="!hasPreviousDay">
+                    <span>←</span>
+                </button>
+                <input type="date" 
+                       v-model="selectedDate" 
+                       @change="loadDateData"
+                       class="date-select"
+                       :max="new Date().toISOString().split('T')[0]">
+                <button class="nav-button next-day" 
+                        @click="navigateDate(1)"
+                        :disabled="!hasNextDay">
+                    <span>→</span>
+                </button>
+            </div>
+            <h1>桜-TODO</h1>
             <div class="theme-switcher">
                 <button class="theme-button" 
                         :class="{ active: currentTheme === 'dark-purple' }"
@@ -100,7 +110,7 @@
                             </span>
                             <span class="status-tag"
                                   :class="todo.status">
-                                {{ todo.status === 'completed' ? '✅ 已完成' : '🕒 进行中' }}
+                                {{ todo.status === 'completed' ? '✅ 已完成' : '🕒 待完成' }}
                             </span>
                         </div>
                     </div>
@@ -148,8 +158,12 @@
                      class="task-item glass"
                      @click="showTaskDetail(task)">
                     <div class="task-header">
-                        <h3>{{ task.task_name }}</h3>
+                        <h3>{{ task.task_name || task.name }}</h3>
                         <div class="task-meta">
+                            <span class="time-range-tag">
+                                <i class="icon">🕒</i>
+                                {{ formatters.shortTime(task.start_time) }} ~ {{ formatters.shortTime(task.end_time) }}
+                            </span>
                             <span class="time-tag">
                                 <i class="icon">⏱</i>
                                 {{ formatters.time(task.task_len) }}
@@ -163,6 +177,10 @@
                                 {{ '⭐'.repeat(task.satisfaction) }}
                             </span>
                         </div>
+                    </div>
+                    <div class="task-summary" v-if="task.summary">
+                        <span class="summary-icon">💭</span>
+                        <span class="summary-text">{{ formatters.summary(task.summary) }}</span>
                     </div>
                     <div class="task-actions" v-if="editMode">
                         <button @click.stop="deleteTask(task.id)"

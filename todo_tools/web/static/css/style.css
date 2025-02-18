@@ -81,6 +81,17 @@ body {
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+}
+
+body[data-theme="light"] .date-select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
 }
 
 .date-select:hover {
@@ -664,8 +675,10 @@ body[data-theme="light"] {
     background: rgba(0, 0, 0, 0.2);
 }
 
-.task-item.completed h3 {
+.task-item.completed .task-header h3 {
     text-decoration: line-through;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+    text-decoration-thickness: 2px;
 }
 
 .task-header {
@@ -821,4 +834,124 @@ body[data-theme="light"] .time-tag,
 body[data-theme="light"] .importance-tag,
 body[data-theme="light"] .satisfaction-tag {
     background: rgba(0, 0, 0, 0.05);
+}
+
+/* 日期导航样式 */
+.date-navigation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-button {
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--blur-size));
+    border: 1px solid var(--card-border);
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.nav-button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.nav-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.date-select {
+    min-width: 150px;
+}
+
+/* 亮色主题适配 */
+body[data-theme="light"] .nav-button {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body[data-theme="light"] .nav-button:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="light"] .nav-button:disabled {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* 任务摘要样式 */
+.task-summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.summary-icon {
+    font-size: 1rem;
+}
+
+.summary-text {
+    color: var(--text-secondary);
+}
+
+/* 亮色主题适配 */
+body[data-theme="light"] .task-summary {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+body[data-theme="light"] .summary-text {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+/* 任务卡片样式优化 */
+.task-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+}
+
+.task-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.task-meta {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+/* 时间区间标签样式 */
+.time-range-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+}
+
+body[data-theme="light"] .time-range-tag {
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.6);
 } 
