@@ -1,0 +1,824 @@
+/* iOS 风格的基础样式 */
+:root {
+    /* 暗紫色主题颜色 */
+    --primary-bg: linear-gradient(135deg, #4B367C 0%, #2C1810 100%);
+    --card-bg: rgba(255, 255, 255, 0.08);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    --blur-size: 20px;
+    
+    /* iOS 系统颜色 */
+    --ios-blue: #0A84FF;
+    --ios-green: #32D74B;
+    --ios-red: #FF453A;
+    --ios-gray: #98989D;
+    
+    /* 文字颜色 */
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+
+    /* 主题背景 */
+    --dark-purple-bg: linear-gradient(135deg, #4B367C 0%, #2C1810 100%);
+    --light-purple-bg: linear-gradient(135deg, #A78BFA 0%, #C084FC 100%);
+    --dark-green-bg: linear-gradient(135deg, #065F46 0%, #064E3B 100%);
+    --light-green-bg: linear-gradient(135deg, #6EE7B7 0%, #34D399 100%);
+    --dark-bg: linear-gradient(to bottom, #1A1A1A, #2D2D2D);
+    --light-bg: linear-gradient(to bottom, #F3F4F6, #FFFFFF);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    background: var(--primary-bg);
+    min-height: 100vh;
+    color: var(--text-primary);
+    padding: 2rem;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 毛玻璃效果 */
+.glass {
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--blur-size));
+    -webkit-backdrop-filter: blur(var(--blur-size));
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    border-radius: 16px;
+}
+
+/* 头部样式 */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.date-select {
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--blur-size));
+    border: 1px solid var(--card-border);
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.date-select:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 统计卡片 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.stat-title {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+/* 标签页 */
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--blur-size));
+    color: var(--text-primary);
+}
+
+.tab-button.active {
+    background: var(--ios-blue);
+}
+
+/* 表格样式 */
+.content-card {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th {
+    text-align: left;
+    padding: 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+tr:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 按钮样式 */
+.action-button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.edit-button {
+    background: var(--ios-blue);
+    color: var(--text-primary);
+}
+
+.delete-button {
+    background: var(--ios-red);
+    color: var(--text-primary);
+}
+
+.save-button {
+    background: var(--ios-green);
+    color: var(--text-primary);
+}
+
+/* 输入框样式 */
+.input-field {
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--blur-size));
+    border: 1px solid var(--card-border);
+    padding: 0.75rem;
+    border-radius: 8px;
+    color: var(--text-primary);
+    width: 100%;
+    font-size: 0.95rem;
+}
+
+/* 图表容器 */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.chart-card {
+    padding: 1.5rem;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-card canvas {
+    flex: 1;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* 主题切换器 */
+.theme-switcher {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--blur-size));
+    border-radius: 12px;
+    flex-wrap: wrap;
+    max-width: 200px;
+}
+
+.theme-button {
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.theme-button:hover {
+    transform: scale(1.1);
+}
+
+.theme-button.active {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.color-dot {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 8px;
+}
+
+.color-dot.dark-purple {
+    background: linear-gradient(135deg, #4B367C 0%, #2C1810 100%);
+}
+
+.color-dot.light-purple {
+    background: linear-gradient(135deg, #A78BFA 0%, #C084FC 100%);
+}
+
+.color-dot.dark-green {
+    background: linear-gradient(135deg, #065F46 0%, #064E3B 100%);
+}
+
+.color-dot.light-green {
+    background: linear-gradient(135deg, #6EE7B7 0%, #34D399 100%);
+}
+
+.color-dot.dark {
+    background: #1A1A1A;
+}
+
+.color-dot.light {
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* 亮色主题适配 */
+body[data-theme="light"] {
+    --text-primary: #1A1A1A;
+    --text-secondary: #4B5563;
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --card-border: rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="light"] .glass {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+body[data-theme="light"] .tab-button:not(.active) {
+    color: #1A1A1A;
+}
+
+body[data-theme="light"] .input-field {
+    color: #1A1A1A;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .stats-grid,
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    body {
+        padding: 1rem;
+    }
+}
+
+/* iOS 风格的模态框 */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    padding: 1.5rem;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 650px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: rgba(40, 40, 40, 0.8);
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(60, 60, 60, 0.5);
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+}
+
+.modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.close-button {
+    background: rgba(80, 80, 80, 0.5);
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.close-button:hover {
+    background: rgba(100, 100, 100, 0.8);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.detail-item {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(60, 60, 60, 0.3);
+    border-radius: 10px;
+    transition: background-color 0.2s;
+}
+
+.detail-item:hover {
+    background: rgba(70, 70, 70, 0.4);
+}
+
+.label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.detail-item span:not(.label) {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    display: block;
+}
+
+.feeling-text {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(50, 50, 50, 0.5);
+    border-radius: 12px;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+}
+
+/* iOS 风格的滚动条 */
+.modal-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 动画效果 */
+@keyframes modal-in {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+    .modal-backdrop {
+        padding: 1rem;
+    }
+    
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .modal-header {
+        padding: 1rem 1.25rem;
+    }
+    
+    .modal-body {
+        padding: 1.25rem;
+    }
+    
+    .detail-item {
+        padding: 0.875rem;
+        margin-bottom: 1rem;
+    }
+    
+    .feeling-text {
+        padding: 1.25rem;
+        margin-top: 1rem;
+    }
+}
+
+/* 主题样式 */
+body[data-theme="dark-purple"] {
+    background: var(--dark-purple-bg);
+    color: white;
+}
+
+body[data-theme="light-purple"] {
+    background: var(--light-purple-bg);
+    color: white;
+}
+
+body[data-theme="dark-green"] {
+    background: var(--dark-green-bg);
+    color: white;
+}
+
+body[data-theme="light-green"] {
+    background: var(--light-green-bg);
+    color: white;
+}
+
+body[data-theme="dark"] {
+    background: var(--dark-bg);
+    color: white;
+}
+
+body[data-theme="light"] {
+    background: var(--light-bg);
+    color: #1A1A1A;
+}
+
+/* 添加编辑模式开关 */
+.edit-mode-switch {
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--blur-size));
+    border: 1px solid var(--card-border);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+}
+
+.edit-mode-switch:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.edit-mode-switch.active {
+    background: var(--ios-blue);
+    border-color: transparent;
+}
+
+/* 修改表格样式 */
+.todo-item {
+    position: relative;
+    cursor: pointer;
+}
+
+.todo-item .input-field {
+    margin-bottom: 0.5rem;
+}
+
+.todo-item .save-button {
+    margin-top: 0.5rem;
+}
+
+.todo-actions {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    gap: 0.5rem;
+    z-index: 2;
+}
+
+.edit-mode .todo-actions {
+    display: flex;
+}
+
+/* 状态标签样式 */
+.status-tag {
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.status-tag.completed {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34C759;
+}
+
+.status-tag:not(.completed) {
+    background: rgba(255, 159, 10, 0.2);
+    color: #FF9F0A;
+}
+
+/* 编辑表单样式 */
+.edit-form {
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+}
+
+.edit-form .input-field {
+    margin-bottom: 0.5rem;
+}
+
+.edit-form .action-button {
+    margin-top: 0.5rem;
+}
+
+/* 点击效果 */
+.todo-item:active {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* 修复乱码问题 */
+.icon {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    font-style: normal;
+}
+
+/* 标签样式 */
+.time-tag,
+.importance-tag,
+.status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.icon {
+    font-size: 1rem;
+}
+
+/* 任务项样式 */
+.task-item {
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.task-item.completed {
+    opacity: 0.7;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.task-item.completed h3 {
+    text-decoration: line-through;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.task-header h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #FF8A4C, #FF6B3D);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    padding: 0.25rem 0;
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.time-tag,
+.importance-tag,
+.status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.status-tag.completed {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34C759;
+}
+
+.status-tag:not(.completed) {
+    background: rgba(255, 159, 10, 0.2);
+    color: #FF9F0A;
+}
+
+/* 编辑表单样式 */
+.edit-form {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.edit-form .input-field {
+    margin-bottom: 0.75rem;
+}
+
+.edit-form .input-field:last-of-type {
+    margin-bottom: 1rem;
+}
+
+/* 操作按钮样式 */
+.task-actions {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    display: none;
+    gap: 0.5rem;
+}
+
+.edit-mode .task-actions {
+    display: flex;
+}
+
+/* 亮色主题适配 */
+body[data-theme="light"] .task-item {
+    background: var(--card-bg);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+body[data-theme="light"] .task-item.completed {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body[data-theme="light"] .edit-form {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+body[data-theme="light"] .task-meta {
+    color: var(--text-secondary);
+}
+
+body[data-theme="light"] .time-tag,
+body[data-theme="light"] .importance-tag,
+body[data-theme="light"] .status-tag {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+}
+
+body[data-theme="light"] .status-tag.completed {
+    background: rgba(52, 199, 89, 0.15);
+    color: #15803D;
+}
+
+body[data-theme="light"] .status-tag:not(.completed) {
+    background: rgba(245, 158, 11, 0.15);
+    color: #B45309;
+}
+
+body[data-theme="light"] .empty-state {
+    color: var(--text-secondary);
+}
+
+/* 任务卡片悬停效果 */
+.task-item {
+    transition: all 0.3s ease;
+}
+
+.task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.task-item:hover .task-header h3 {
+    transform: translateY(-1px);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+body[data-theme="light"] .task-item:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* 任务列表样式 */
+.tasks-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* 亮色主题适配 */
+body[data-theme="light"] .time-tag,
+body[data-theme="light"] .importance-tag,
+body[data-theme="light"] .satisfaction-tag {
+    background: rgba(0, 0, 0, 0.05);
+} 

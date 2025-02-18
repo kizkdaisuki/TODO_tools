@@ -4,248 +4,246 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TODO Dashboard</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .glass {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .fade-enter-active,
-        .fade-leave-active {
-            transition: opacity 0.3s ease;
-        }
-        
-        .fade-enter-from,
-        .fade-leave-to {
-            opacity: 0;
-        }
-    </style>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="p-6">
-    <div id="app" class="max-w-7xl mx-auto">
-        <!-- 标题 -->
-        <h1 class="text-4xl font-bold text-white mb-8 text-center">TODO Dashboard</h1>
-        
-        <!-- 统计卡片 -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="glass rounded-xl p-6 text-white">
-                <h3 class="text-lg font-semibold mb-2">任务完成率</h3>
-                <p class="text-3xl font-bold">{{ completionRate }}%</p>
-            </div>
-            <div class="glass rounded-xl p-6 text-white">
-                <h3 class="text-lg font-semibold mb-2">平均满意度</h3>
-                <p class="text-3xl font-bold">{{ avgSatisfaction }}⭐</p>
-            </div>
-            <div class="glass rounded-xl p-6 text-white">
-                <h3 class="text-lg font-semibold mb-2">时间效率</h3>
-                <p class="text-3xl font-bold">{{ timeEfficiency }}%</p>
+<body>
+    <div id="app" class="container">
+        <div class="header">
+            <select v-model="selectedDate" 
+                    @change="loadDateData"
+                    class="date-select">
+                <option v-for="date in availableDates" :key="date" :value="date">
+                    {{ date }}
+                </option>
+            </select>
+            <h1>TODO Dashboard</h1>
+            <div class="theme-switcher">
+                <button class="theme-button" 
+                        :class="{ active: currentTheme === 'dark-purple' }"
+                        @click="changeTheme('dark-purple')">
+                    <span class="color-dot dark-purple"></span>
+                </button>
+                <button class="theme-button"
+                        :class="{ active: currentTheme === 'light-purple' }"
+                        @click="changeTheme('light-purple')">
+                    <span class="color-dot light-purple"></span>
+                </button>
+                <button class="theme-button"
+                        :class="{ active: currentTheme === 'dark-green' }"
+                        @click="changeTheme('dark-green')">
+                    <span class="color-dot dark-green"></span>
+                </button>
+                <button class="theme-button"
+                        :class="{ active: currentTheme === 'light-green' }"
+                        @click="changeTheme('light-green')">
+                    <span class="color-dot light-green"></span>
+                </button>
+                <button class="theme-button"
+                        :class="{ active: currentTheme === 'dark' }"
+                        @click="changeTheme('dark')">
+                    <span class="color-dot dark"></span>
+                </button>
+                <button class="theme-button"
+                        :class="{ active: currentTheme === 'light' }"
+                        @click="changeTheme('light')">
+                    <span class="color-dot light"></span>
+                </button>
             </div>
         </div>
         
-        <!-- 切换按钮 -->
-        <div class="flex justify-center mb-8 space-x-4">
-            <button 
-                @click="currentView = 'todos'"
-                :class="['px-6 py-2 rounded-full transition-all duration-300', 
-                        currentView === 'todos' 
-                            ? 'bg-white text-purple-600 shadow-lg' 
-                            : 'glass text-white hover:bg-white/30']">
+        <div class="stats-grid">
+            <div class="stat-card glass">
+                <div class="stat-title">任务完成率</div>
+                <div class="stat-value">{{ completionRate }}%</div>
+            </div>
+            <div class="stat-card glass">
+                <div class="stat-title">平均满意度</div>
+                <div class="stat-value">{{ avgSatisfaction }}⭐</div>
+            </div>
+            <div class="stat-card glass">
+                <div class="stat-title">时间效率</div>
+                <div class="stat-value">{{ timeEfficiency }}%</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button @click="currentView = 'todos'"
+                    :class="['tab-button', currentView === 'todos' ? 'active' : '']">
                 待办事项
             </button>
-            <button 
-                @click="currentView = 'tasks'"
-                :class="['px-6 py-2 rounded-full transition-all duration-300', 
-                        currentView === 'tasks' 
-                            ? 'bg-white text-purple-600 shadow-lg' 
-                            : 'glass text-white hover:bg-white/30']">
+            <button @click="currentView = 'tasks'"
+                    :class="['tab-button', currentView === 'tasks' ? 'active' : '']">
                 已完成任务
             </button>
         </div>
         
-        <!-- 数据表格 -->
-        <div class="glass rounded-xl p-6">
-            <transition name="fade" mode="out-in">
-                <!-- 待办事项表格 -->
-                <table v-if="currentView === 'todos'" class="w-full text-white">
-                    <thead>
-                        <tr class="border-b border-white/20">
-                            <th class="py-3 text-left">任务名称</th>
-                            <th class="py-3 text-left">预计时长</th>
-                            <th class="py-3 text-left">重要性</th>
-                            <th class="py-3 text-left">状态</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="todo in todos" 
-                            :key="todo.id" 
-                            class="border-b border-white/10 hover:bg-white/10 transition-colors">
-                            <td class="py-3">{{ todo.name }}</td>
-                            <td class="py-3">{{ todo.time }}</td>
-                            <td class="py-3">{{ todo.importance }}</td>
-                            <td class="py-3">
-                                <span :class="todo.status === 'completed' ? 'text-green-400' : 'text-yellow-400'">
-                                    {{ todo.status === 'completed' ? '✅ 已完成' : '🕒 待完成' }}
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <!-- 已完成任务表格 -->
-                <table v-else class="w-full text-white">
-                    <thead>
-                        <tr class="border-b border-white/20">
-                            <th class="py-3 text-left">任务名称</th>
-                            <th class="py-3 text-left">开始时间</th>
-                            <th class="py-3 text-left">结束时间</th>
-                            <th class="py-3 text-left">计划时长</th>
-                            <th class="py-3 text-left">实际时长</th>
-                            <th class="py-3 text-left">重要性</th>
-                            <th class="py-3 text-left">满意度</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="task in tasks" 
-                            :key="task.task_id" 
-                            class="border-b border-white/10 hover:bg-white/10 transition-colors">
-                            <td class="py-3">{{ task.task_name }}</td>
-                            <td class="py-3">{{ task.start_time }}</td>
-                            <td class="py-3">{{ task.end_time }}</td>
-                            <td class="py-3">{{ task.planned_time }}</td>
-                            <td class="py-3">{{ task.task_len }}</td>
-                            <td class="py-3">{{ task.importance }}</td>
-                            <td class="py-3">{{ '⭐'.repeat(task.satisfaction) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </transition>
+        <div class="content-card glass" :class="{ 'edit-mode': editMode }">
+            <div v-if="currentView === 'todos'" class="tasks-list">
+                <div v-for="todo in sortedTodos" 
+                     :key="todo.id"
+                     class="task-item glass"
+                     :class="{ completed: todo.status === 'completed' }"
+                     @click="showTaskDetail(todo)">
+                    <div class="task-header">
+                        <h3>{{ todo.name }}</h3>
+                        <div class="task-meta">
+                            <span class="time-tag">
+                                <i class="icon">⏱</i>
+                                {{ formatters.time(todo.time) }}
+                            </span>
+                            <span class="importance-tag"
+                                  :style="{ color: formatters.importance(todo.importance).color }">
+                                <i class="icon">🎯</i>
+                                {{ formatters.importance(todo.importance).text }}
+                            </span>
+                            <span class="status-tag"
+                                  :class="todo.status">
+                                {{ todo.status === 'completed' ? '✅ 已完成' : '🕒 进行中' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div v-if="editingTodo === todo.id" 
+                         class="edit-form"
+                         @click.stop>
+                        <input v-model="todo.name" 
+                               class="input-field"
+                               placeholder="任务名称"
+                               @keyup.enter="saveTodo(todo)">
+                        <select v-model="todo.time" class="input-field">
+                            <option v-for="time in timeOptions" :value="time">
+                                {{ formatters.time(time) }}
+                            </option>
+                        </select>
+                        <select v-model="todo.importance" class="input-field">
+                            <option value="low">低优先级</option>
+                            <option value="mid">中优先级</option>
+                            <option value="high">高优先级</option>
+                        </select>
+                        <button @click="saveTodo(todo)"
+                                class="action-button save-button">
+                            保存
+                        </button>
+                    </div>
+                    <div class="task-actions" v-if="editMode">
+                        <button @click.stop="editingTodo = todo.id"
+                                class="action-button edit-button">
+                            编辑
+                        </button>
+                        <button @click.stop="deleteTodo(todo.id)"
+                                class="action-button delete-button">
+                            删除
+                        </button>
+                    </div>
+                </div>
+                <div v-if="todos.length === 0" class="empty-state">
+                    暂无待办事项
+                </div>
+            </div>
+            
+            <div v-else class="tasks-list">
+                <div v-for="task in tasks" 
+                     :key="task.id"
+                     class="task-item glass"
+                     @click="showTaskDetail(task)">
+                    <div class="task-header">
+                        <h3>{{ task.task_name }}</h3>
+                        <div class="task-meta">
+                            <span class="time-tag">
+                                <i class="icon">⏱</i>
+                                {{ formatters.time(task.task_len) }}
+                            </span>
+                            <span class="importance-tag"
+                                  :style="{ color: formatters.importance(task.importance).color }">
+                                <i class="icon">🎯</i>
+                                {{ formatters.importance(task.importance).text }}
+                            </span>
+                            <span class="satisfaction-tag">
+                                {{ '⭐'.repeat(task.satisfaction) }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="task-actions" v-if="editMode">
+                        <button @click.stop="deleteTask(task.id)"
+                                class="action-button delete-button">
+                            删除
+                        </button>
+                    </div>
+                </div>
+                <div v-if="tasks.length === 0" class="empty-state">
+                    暂无已完成任务
+                </div>
+            </div>
         </div>
         
-        <!-- 图表 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            <div class="glass rounded-xl p-6">
+        <div class="charts-grid">
+            <div class="chart-card glass">
                 <canvas id="completionChart"></canvas>
             </div>
-            <div class="glass rounded-xl p-6">
+            <div class="chart-card glass">
                 <canvas id="timeChart"></canvas>
             </div>
         </div>
+
+        <div v-if="selectedTask" 
+             class="modal-backdrop"
+             @click="selectedTask = null">
+            <div class="modal-content glass" 
+                 @click.stop>
+                <div class="modal-header">
+                    <h3>任务详情</h3>
+                    <button @click="selectedTask = null"
+                            class="close-button">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="detail-item">
+                        <span class="label">任务名称：</span>
+                        <span v-text="selectedTask.task_name"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">开始时间：</span>
+                        <span v-text="selectedTask.start_time"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">结束时间：</span>
+                        <span v-text="selectedTask.end_time"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">计划时长：</span>
+                        <span v-text="selectedTask.planned_time"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">实际时长：</span>
+                        <span v-text="selectedTask.task_len"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">重要性：</span>
+                        <span v-text="selectedTask.importance"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">满意度：</span>
+                        <span v-text="'⭐'.repeat(selectedTask.satisfaction)"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">感受：</span>
+                        <div class="feeling-text" v-text="selectedTask.feeling || '暂无感受'"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加编辑模式开关 -->
+        <button class="edit-mode-switch" 
+                :class="{ active: editMode }"
+                @click="toggleEditMode">
+            <span v-if="editMode">完成</span>
+            <span v-else>编辑</span>
+        </button>
     </div>
 
-    <script>
-        const { createApp, onMounted, ref } = Vue
-
-        createApp({
-            setup() {
-                const currentView = ref('todos')
-                const todos = ref([])
-                const tasks = ref([])
-                const completionRate = ref(0)
-                const avgSatisfaction = ref(0)
-                const timeEfficiency = ref(0)
-                
-                // 获取数据
-                const fetchData = async () => {
-                    const [todosRes, tasksRes, summaryRes] = await Promise.all([
-                        fetch('/api/todos').then(r => r.json()),
-                        fetch('/api/tasks').then(r => r.json()),
-                        fetch('/api/summary').then(r => r.json())
-                    ])
-                    
-                    todos.value = Object.values(todosRes)
-                    tasks.value = Object.values(tasksRes)
-                    
-                    // 更新统计数据
-                    completionRate.value = summaryRes.completion_rate
-                    avgSatisfaction.value = summaryRes.avg_satisfaction
-                    timeEfficiency.value = summaryRes.time_efficiency
-                    
-                    // 更新图表
-                    updateCharts(summaryRes)
-                }
-                
-                // 初始化图表
-                const updateCharts = (data) => {
-                    // 任务完成情况图表
-                    new Chart(document.getElementById('completionChart'), {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['已完成', '未完成'],
-                            datasets: [{
-                                data: [data.completed_tasks, data.total_tasks - data.completed_tasks],
-                                backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(255, 255, 255, 0.2)']
-                            }]
-                        },
-                        options: {
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        color: 'white'
-                                    }
-                                }
-                            }
-                        }
-                    })
-                    
-                    // 时间效率图表
-                    new Chart(document.getElementById('timeChart'), {
-                        type: 'bar',
-                        data: {
-                            labels: ['计划时长', '实际时长'],
-                            datasets: [{
-                                data: [data.planned_time, data.actual_time],
-                                backgroundColor: ['rgba(255, 255, 255, 0.5)', 'rgba(147, 51, 234, 0.5)']
-                            }]
-                        },
-                        options: {
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    ticks: {
-                                        color: 'white'
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        color: 'white'
-                                    }
-                                }
-                            }
-                        }
-                    })
-                }
-                
-                onMounted(() => {
-                    fetchData()
-                    // 每分钟刷新一次数据
-                    setInterval(fetchData, 60000)
-                })
-                
-                return {
-                    currentView,
-                    todos,
-                    tasks,
-                    completionRate,
-                    avgSatisfaction,
-                    timeEfficiency
-                }
-            }
-        }).mount('#app')
-    </script>
+    <script src="/static/js/app.js"></script>
 </body>
 </html> 

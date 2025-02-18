@@ -30,6 +30,8 @@ setup(
     python_requires=">=3.8",
     package_data={
         'todo_tools': [
+            'web/static/css/*',
+            'web/static/js/*',
             'web/static/*',
         ],
     },

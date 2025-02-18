@@ -1,1 +1,4 @@
 include todo_tools/web/static/* 
+include todo_tools/web/static/css/style.css
+include todo_tools/web/static/js/app.js
+include todo_tools/web/static/index.html 
